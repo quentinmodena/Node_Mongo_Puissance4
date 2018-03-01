@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Puissance 4</title>
+    <link href="./style.css" rel="stylesheet" type="text/css">
+    <script
+			  src="./jquery-3.3.1.min.js"></script>
+  </head>
+  <body>
+
+<div id="menu-top">
+  <ul>
+    <li><a href="">Liste des parties</a></li>
+    <li><a onclick="newGame()">Nouvelle partie</a></li>
+  </ul>
+  <div class="menu-user">
+    <div class="user"></div>
+  </div>
+</div>
+
+
+    <table class='listeParties bloc'>
+
+    </table>
+
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <label for="pseudo">Entrez un pseudo : </label>
+        <input type="text" id="pseudo" class="inputModal"></input>
+        <br>
+        <button id="buttonPseudo" class="buttonModal">Se connecter</button>
+      </div>
+    </div>
+
+    <div id="newPartieJoueur" class="modal">
+      <div class="modal-content">
+        <label for="pseudoJ2">Entrez un pseudo pour le second joueur : </label>
+        <input type="text" id="pseudoJ2" class="inputModal"></input>
+        <br>
+        <button id="buttonNouvellePartie" class="buttonModal">Nouvelle partie</button>
+      </div>
+
+    </div>
+
+  </body>
+</html>
+
+
+<script src="./functions.js"></script>
+<script src='./connexion.js'></script>
+<script src='./formatAffichage.js'></script>
+
+<script>
+  let pseudo = null;
+
+  const getAllGames = function(){
+    jQuery.get('http://localhost:8080/jeux/'+pseudo).done(function(retourJson){
+      console.log(retourJson);
+      let tableauHtml = "<tr><th>Etat de la partie</th><th>Joueurs</th><th>Lien</th></tr>";
+
+      for(let partie of retourJson)
+      {
+        tableauHtml += "<tr><td>"+
+                          formatEtat(partie)+
+                        "</td><td>"+
+                          formatPseudoVS(partie.joueurs)+
+                        "</td><td>"+
+                          "<a href='jeu.html?id="+partie._id+"'>Voir la partie</a>"+
+                        "</td></tr>";
+      }
+
+      $('.listeParties').html(tableauHtml);
+    });
+  }
+
+  if(localStorage.getItem('login') != null){
+    pseudo = localStorage.getItem('login');
+    getAllGames();
+  }
+
+
+  const params = new URLSearchParams(location.search);
+
+  const construirePlateau = function(plateauJson)
+  {
+    let ligne, casePlateau, htmlLigne = "", htmlPlateau = "", pion;
+
+    for(ligne of plateauJson) {
+      for(colonne in ligne)
+      {
+        pion = "";
+
+        if(ligne[colonne] == "1")
+          pion = "<div class='joueur1'></div>"
+        else if(ligne[colonne] == "2")
+          pion = "<div class='joueur2'></div>"
+
+        htmlLigne += "<th class='case' data-colonne='"+colonne+"'>"+pion+"</th>";
+      }
+      htmlPlateau += "<tr class='ligne'>"+htmlLigne+"</tr>";
+      htmlLigne = "";
+    }
+    jQuery('.plateau').html(htmlPlateau);
+  }
+
+  const jouer = function(idJoueur, colonne){
+    jQuery.post('http://localhost:8080/jeu/'+id+'/jouer', {idJoueur, colonne}).done(function(data){
+      if(data.statut == "victoire 1" || data.statut == "victoire 2")
+      {
+        construirePlateau(data.jeu.plateau);
+        victoire(data.joueurGagnant);
+      }
+      else if(data.statut == "ok")
+      {
+        changeIdJoueur();
+        construirePlateau(data.jeu.plateau);
+      }
+    });
+  };
+
+  const victoire = function(joueur){
+    jQuery(".infos").html("Vicoire de "+joueur.pseudo);
+    jQuery(".boutonRetry").show();
+  }
+
+  const changeIdJoueur = function()
+  {
+    if(idJoueur == "1")
+      idJoueur = "2"
+    else
+      idJoueur = "1"
+  }
+
+
+</script>

@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  dev:
+    image: node:9.6.1
+    command: bash
+    user: $NODE_USER
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+  index:
+    image: node:9.6.1
+    command: node /app/projet/index.js
+    user: $NODE_USER
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+  root:
+    image: node:9.6.1
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+  mongo:
+    image: mongo:3.7

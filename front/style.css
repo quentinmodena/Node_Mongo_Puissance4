@@ -1,0 +1,318 @@
+html {
+        margin: 0;
+        padding:0;
+        font-family: monospace;
+        text-transform: uppercase;
+      }
+      body {
+        margin: 0;
+        padding:0;
+        padding-top: 100px;
+        height: 100%;
+        position: relative;
+      }
+
+      #menu-top {
+        position: fixed;
+        height: 50px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        border-bottom: 1px solid #CCC;
+        line-height: 50px;
+        z-index: 10;
+        top: 0;
+      }
+
+      #menu-top ul {
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: row;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      #menu-top ul li {
+        margin-right: 20px;
+
+      }
+
+      #menu-top ul li a {
+        padding-right: 20px;
+        border-right: 1px solid #1e97ff;
+        font-weight: bold;
+        color: #1e97ff;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      #menu-top .menu-user a {
+        color: #FFF;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 2px 5px;
+        text-decoration: none;
+        background-color: #1e97ff;
+      }
+
+      .home {
+        position: relative;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .home .content-home {
+        border: 4px solid #1e97ff;
+        width: 400px;
+        height: 400px;
+        margin: auto;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .joueurs {
+        position: relative;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .joueurs .content-home {
+        border: 4px solid #1e97ff;
+        margin: auto;
+        padding: 15px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .bloc{
+        border: 4px solid #1e97ff;
+        margin: auto;
+        padding: 15px;
+      }
+
+      .listeParties tr{
+        border: grey 2px solid;
+        padding: 0 10px;
+      }
+
+      .listeParties th{
+        padding-bottom: 10px;
+        text-align: left;
+      }
+
+      .listeParties td{
+        padding-bottom: 5px;
+        padding-right: 10px;
+      }
+
+      .home .content-home .menu {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .home .content-home .menu a {
+          text-align: center;
+          background-color: #1e97ff;
+          color: #FFF;
+          padding: 5px 10px;
+          width: 150px;
+          display: block;
+          margin-bottom: 10px;
+          text-decoration: none;
+          transition: all 0.4s ease;
+      }
+
+      .home .content-home .menu a:hover {
+          background-color: #3da1f7;
+      }
+
+  .modal::after {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    content: "";
+    position: absolute;
+    top: 0;
+    z-index: 50;
+}
+
+.displayInlineBlock{
+  display: inline-block;
+}
+
+.nameJoueur1image{
+  background: url(pions.png) 0 0;
+  background-size: 40px 40px;
+  width:20px;
+  height:20px;
+}
+
+.nameJoueur2image{
+  background: url(pions.png) 0 20px;
+  background-size: 40px 40px;
+  width:20px;
+  height:20px;
+}
+
+.buttonModal{
+  text-align: center;
+  background-color: #1e97ff;
+  color: #FFF;
+  padding: 5px 10px;
+  width: 150px;
+  display: block;
+  margin-bottom: 10px;
+  text-decoration: none;
+  transition: all 0.4s ease;
+  border: 0;
+margin: auto;
+cursor: pointer;
+}
+
+.buttonModal:hover {
+  background-color: #3da1f7;
+}
+
+
+.modal-content label{
+  font-weight: bold;
+}
+
+.inputModal{
+
+  width: 50%;
+margin: auto;
+margin-top:20px;
+text-align: center;
+border-radius: 0;
+display: block;
+border: 0;
+    border-bottom-width: 0px;
+    border-bottom-style: none;
+    border-bottom-color: currentcolor;
+background-color: transparent;
+border-bottom: 1px solid #1e97ff;
+padding-bottom: 5px;
+
+}
+
+
+.plateau{
+  display: inline-block;
+}
+
+.joueurs{
+  display:inline-block;
+  vertical-align: top;
+}
+
+.menu{
+border: grey 2px solid;
+padding: 0 10px;
+display:inline-block
+}
+
+.separateur{
+  display:inline-block;
+  border-right:1px grey solid;
+  height: 12px;
+margin: 0 5px;
+
+}
+
+.sousmenu{
+  padding: 10px 0px;
+  display: inline-block;
+  cursor: pointer;
+}
+.case{
+  border: 1px solid grey;
+  width:80px;
+  height:80px;
+  position: relative;
+}
+
+.case div{
+  position: absolute;
+  width:80px;
+  height:80px;
+  top: 1px;
+}
+
+
+
+.joueur1{
+  background: url(pions.png) 0 0;
+}
+
+.joueur2{
+  background: url(pions.png) 0 80px;
+}
+
+
+body {font-family: Arial, Helvetica, sans-serif;}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 23; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+margin: auto;
+padding: 20px;
+border: 1px solid #888;
+width: 520px;
+z-index: 1000;
+position: relative;
+text-align: center;
+display: flex;
+flex-direction: column;
+min-height: 100px;
+justify-content: space-between;
+
+}
+
+.disconnect{
+  cursor: pointer;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
