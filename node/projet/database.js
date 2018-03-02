@@ -17,8 +17,8 @@ module.exports = {
   getJeuPseudo: function(pseudo, callback){
     MongoClient.connect(url, function(err, client) {
       const col = client.db(dbName).collection('jeu');
- 
-      col.find({joueurs: {$elemMatch: {pseudo}}}).toArray(callback);
+
+      col.find({joueurs: {$elemMatch: {pseudo}}}).sort({_id : -1}).toArray(callback);
       client.close();
     });
   },
@@ -28,7 +28,6 @@ module.exports = {
 
       const col = client.db(dbName).collection('jeu');
 
-      //col.findOne({_id: "5a9558a785a5d8019bfdfaa2"}, callback);
       col.findOne({"_id": ObjectId(id)},callback);
       client.close();
     });
@@ -37,5 +36,38 @@ module.exports = {
   setPseudos: function(id, request){
     traitementJeu.setPseudo("1", request.pseudoJ1);
     traitementJeu.setPseudo("2", request.pseudoJ2);
-  }
+  },
+
+  addChat: function(data, callback){
+    MongoClient.connect(url, function(err, client) {
+      const col = client.db(dbName).collection('chat');
+
+      col.save(data, {w:1}, function(err, result) {
+        callback(err, result);
+
+        client.close();
+      });
+    });
+  },
+
+  getChat: function(idGame, callback){
+    MongoClient.connect(url, function(err, client) {
+
+      const col = client.db(dbName).collection('chat');
+
+      col.findOne({"_id": idGame},callback);
+
+      client.close();
+    });
+  },
+
+  getAllChat: function(pseudo, callback){
+    MongoClient.connect(url, function(err, client) {
+      const col = client.db(dbName).collection('chat');
+
+      col.find({}).toArray(callback);
+      client.close();
+    });
+  },
+
 }

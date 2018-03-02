@@ -19,29 +19,56 @@
     </div>
 
     <table class="plateau"></table>
-
+<div class="displayInlineBlock">
+<div class="colonneNextTableau">
     <div class="joueurs">
+
       <div class="content-home">
         <div class="listeJoueurs">
+          <h3 style="font-size:16px">Match :</h3>
+
           <div class="displayInlineBlock">
-            <div class="nameJoueur1 displayInlineBlock"></div>
-            <div class="nameJoueur1image displayInlineBlock"></div>
+            <div class="nameJoueur1"></div>
+            <div class="nameJoueur1image"></div>
           </div>
 
-            <div>VS</div>
+          <div  class="displayInlineBlock">VS</div>
+
           <div class="displayInlineBlock">
-            <div class="nameJoueur2 displayInlineBlock"></div>
-            <div class="nameJoueur2image displayInlineBlock"></div>
+            <div class="nameJoueur2"></div>
+            <div class="nameJoueur2image"></div>
           </div>
         </div>
       </div>
     </div>
 
-
+    <div class="content-home blocInformations" style="text-align:center; display:none">
+      <h3 style="font-size:16px">Informations :</h3>
+        <div class="tourSuivant"></div>
     </div>
 
-    <div class="infos"></div>
-    <button class="boutonRetry" style="display:none" onclick="newGame()">Recommencer ?</button>
+
+    <div class="content-home blocFinPartie" style="text-align:center; display:none">
+      <h3 style="font-size:16px">Fin de la partie :</h3>
+
+      <div class="infos"></div>
+      <button class="boutonRetry" style="display:none" onclick="newGameWithoutPopup()">Recommencer ?</button>
+    </div>
+</div>
+
+<div class="colonneNextTableau">
+    <div class="content-home blocChat" style="text-align:center;">
+      <h3 style="font-size:16px">Chat :</h3>
+
+      <div class="chat"></div>
+
+      <textarea id="messageChat" style="width: 90%;"></textarea>
+      <button onclick="submitMessage()">Envoyer</button>
+    </div>
+  </div>
+
+</div>
+
 
     <!-- The Modal -->
     <div id="myModal" class="modal">
@@ -53,6 +80,16 @@
         <input type="text" id="pseudo" class="inputModal"></input>
         <br>
         <button id="buttonPseudo" class="buttonModal">Se connecter</button>
+      </div>
+
+    </div>
+
+    <div id="newPartieJoueur" class="modal">
+      <div class="modal-content">
+        <label for="pseudoJ2">Entrez un pseudo pour le second joueur : </label>
+        <input type="text" id="pseudoJ2" class="inputModal"></input>
+        <br>
+        <button id="buttonNouvellePartie" class="buttonModal">Nouvelle partie</button>
       </div>
 
     </div>
@@ -77,29 +114,141 @@
 
   let plateauCourant = null;
 
-  jQuery.get('http://localhost:8080/jeu/'+id).done(function(data){
-    idJoueur = data.prochainJoueur;
 
-    construirePlateau(data.plateau);
+  if (!!window.EventSource) {
+    var source = new EventSource('http://localhost:8080/jeu/'+id)
 
-    let htmlJoueurs = "";
+    source.addEventListener('plateauChange', function(e) {
+      data = JSON.parse(e.data)
 
-    for(let joueur of data.joueurs)
-    {
-      jQuery('.nameJoueur'+joueur.id).html(joueur['pseudo']);
-    }
+        //Premiere connexion
+        if(data.jeu == null)
+        {
+          idJoueur = getIdJoueurCourant(data.joueurs);
 
+          construirePlateau(data.plateau)
 
+          let htmlJoueurs = "";
 
-    if(data.joueurGagnant != null)
-    {
-      victoire(data.joueurGagnant)
-    }
-  });
+          for(let joueur of data.joueurs)
+          {
+            jQuery('.nameJoueur'+joueur.id).html(joueur['pseudo']);
+          }
+
+          if(data.joueurGagnant != null)
+          {
+            victoire(data.joueurGagnant)
+          }
+
+          if(data.etat == "2" && data.joueurGagnant == null)
+          {
+            jQuery(".infos").html("Match nul");
+            jQuery(".boutonRetry").show();
+            jQuery(".blocFinPartie").show();
+          }
+
+          jQuery('#pseudoJ2').val(getPseudoAdversaire(data.joueurs))
+
+          afficheMessageTour(data);
+        }
+        else {
+          if(data.statut == "victoire 1" || data.statut == "victoire 2")
+          {
+            construirePlateau(data.jeu.plateau);
+            victoire(data.joueurGagnant);
+          }
+          else if(data.statut == "ok")
+          {
+            //changeIdJoueur();
+            construirePlateau(data.jeu.plateau);
+          }
+          if(data.jeu.etat == "2" && data.jeu.joueurGagnant == null)
+          {
+            jQuery(".infos").html("Match nul");
+            jQuery(".boutonRetry").show();
+            jQuery(".blocFinPartie").show();
+            jQuery(".blocInformations").hide();
+          }
+
+          afficheMessageTour(data.jeu);
+        }
+    }, false)
+
+    source.addEventListener('open', function(e) {
+      console.log("Connected")
+    }, false)
+
+    source.addEventListener('error', function(e) {
+      if (e.target.readyState == EventSource.CLOSED) {
+        console.log("Disconnected")
+      }
+      else if (e.target.readyState == EventSource.CONNECTING) {
+        console.log("Connecting...")
+      }
+    }, false)
+
+    var chat = new EventSource('http://localhost:8080/chat/'+id)
+
+    chat.addEventListener('chatChange', function(e) {
+      data = JSON.parse(e.data)
+
+      console.log('CHAT');
+
+      let chatHtml = "";
+
+      for(let message of data.chat)
+      {
+        chatHtml += "<p><b>"+message.pseudo+"</b> : "+message.message+"</p>";
+      }
+      $('.chat').html(chatHtml);
+    }, false)
+
+  } else {
+    console.log("Your browser doesn't support SSE")
+  }
+
 
   jQuery('.plateau').on("click", ".case", function(){
     jouer(idJoueur, jQuery(this).data('colonne'));
   });
+
+  const getIdJoueurCourant = function(joueurs){
+    let retour
+
+    for(let joueur of joueurs)
+    {
+      if(joueur.pseudo == pseudo)
+      {
+        retour = joueur.id;
+      }
+    }
+
+    return retour;
+  }
+
+  const afficheMessageTour = function(data){
+    let message = "";
+
+    if(data.joueurGagnant == null && data.etat < "2")
+    {
+      if(data.prochainJoueur == idJoueur)
+      {
+        message = "A votre tour de jouer !";
+      }
+      else {
+        for(let joueur of data.joueurs)
+        {
+          if(data.prochainJoueur == joueur.id)
+            message = "En attente de "+ joueur.pseudo;
+        }
+      }
+
+      jQuery(".blocInformations").show();
+    }
+
+
+    $('.tourSuivant').html(message);
+  }
 
   const construirePlateau = function(plateauJson)
   {
@@ -148,27 +297,18 @@
 
   const faireAparaitrePion = function(ligne, colonne, pion){
     $('[data-ligne='+ligne+'] [data-colonne='+colonne+']').html(pion);
-    $('[data-ligne='+ligne+'] [data-colonne='+colonne+'] div').animate({'top' : '1px'}, 300);
+    $('[data-ligne='+ligne+'] [data-colonne='+colonne+'] div').animate({'top' : '50%'}, 300);
   }
 
   const jouer = function(idJoueur, colonne){
-    jQuery.post('http://localhost:8080/jeu/'+id+'/jouer', {idJoueur, colonne}).done(function(data){
-      if(data.statut == "victoire 1" || data.statut == "victoire 2")
-      {
-        construirePlateau(data.jeu.plateau);
-        victoire(data.joueurGagnant);
-      }
-      else if(data.statut == "ok")
-      {
-        changeIdJoueur();
-        construirePlateau(data.jeu.plateau);
-      }
-    });
+    jQuery.post('http://localhost:8080/jeu/'+id+'/jouer', {idJoueur, colonne});
   };
 
   const victoire = function(joueur){
     jQuery(".infos").html("Vicoire de "+joueur.pseudo);
     jQuery(".boutonRetry").show();
+    jQuery(".blocFinPartie").show();
+    jQuery(".blocInformations").hide();
   }
 
   const changeIdJoueur = function()
@@ -177,6 +317,26 @@
       idJoueur = "2"
     else
       idJoueur = "1"
+  }
+
+  const submitMessage = function(){
+    $.post('http://localhost:8080/chat/new/'+id, {pseudo, message : $('#messageChat').val()}, function(retourJson){
+      //console.log(retourJson);
+    });
+  }
+
+  getPseudoAdversaire = function(joueurs){
+    let retour
+
+    for(let joueur of joueurs)
+    {
+      if(joueur.pseudo != pseudo)
+      {
+        retour = joueur.pseudo;
+      }
+    }
+
+    return retour;
   }
 
 </script>

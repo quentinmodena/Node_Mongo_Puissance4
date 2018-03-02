@@ -57,11 +57,13 @@
   const getAllGames = function(){
     jQuery.get('http://localhost:8080/jeux/'+pseudo).done(function(retourJson){
       console.log(retourJson);
-      let tableauHtml = "<tr><th>Etat de la partie</th><th>Joueurs</th><th>Lien</th></tr>";
+      let tableauHtml = "<tr><th>Date de création</th><th>Etat de la partie</th><th>Joueurs</th><th>Lien</th></tr>";
 
       for(let partie of retourJson)
       {
         tableauHtml += "<tr><td>"+
+                          formatDate(partie._id)+
+                        "</td><td>"+
                           formatEtat(partie)+
                         "</td><td>"+
                           formatPseudoVS(partie.joueurs)+
